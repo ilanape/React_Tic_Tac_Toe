@@ -53,7 +53,12 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      history: [{squares: Array(9).fill(null)}], //stores past moves squares status
+      history: [ //stores the squares status in previous moves
+        {
+          squares: Array(9).fill(null), 
+          moveSquare: null //the index of the square clicked on in this move
+        }
+      ], 
       stepNumber: 0,
       xIsNext: true
     };
@@ -69,7 +74,12 @@ class Game extends React.Component {
     }
     squares[i] = this.state.xIsNext ? "X" : "O";
     this.setState({
-      history: history.concat([{squares: squares}]),
+      history: history.concat([
+        {
+          squares: squares,
+          moveSquare: i 
+        }
+      ]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext
     });
@@ -90,15 +100,21 @@ class Game extends React.Component {
 
     //mapping the history of moves to the buttons on screen
     const moves = history.map((step, move) => { 
+      const moveSquare = step.moveSquare
+      //location calculation
+      const row = Math.floor(moveSquare / 3) + 1;
+      const col = (moveSquare % 3) + 1;
+
       const desc = move ?
-        'Go to move #' + move :
+        'Go to move #' + move + ' ('+col+','+row+')' :
         'Go to game start';
       return (
         //move number as the key - unique
         <li key={move}> 
-          <button onClick={() => this.jumpTo(move)}>
-            {move == this.state.stepNumber ? <b>{desc} </b>: desc}
-            </button>
+          <button 
+          onClick={() => this.jumpTo(move)}>
+          {move == this.state.stepNumber ? <b>{desc} </b>: desc}
+          </button>
         </li>
       );
     });
